@@ -3,25 +3,26 @@ console.log(pokedex);
 
 const fetchPokemon = () => {
     const promises = [];
-    for (let i = 1; i <= 678; i++) {
+    for (let i = 1; i <= 105; i++) {
         const url = `https://pokeapi.co/api/v2/pokemon/${i}/`;
         promises.push(fetch(url)
-            .then((res) => res.json()));
+            .then((res) => res.json())
+            .then((json) => json))
         }
-        Promise.all(promises).then((results) => {
-            const pokemon = results.map((data) => ({
-                name: data.name,
-                id: data.id,
-                image: data.sprites['front_default'],
-                type: data.types.map((type) => type.type.name).join(', ')
-            }));
-            displayPokemon(pokemon);
-        });
+        displayPokemon(promises)
 };
 
-const displayPokemon = (pokemon) => {
-    console.log(pokemon);
-    const pokemonHTMLString = pokemon.map (species => `
+const displayPokemon = (promises) => {
+    console.log(promises);
+    Promise.all(promises).then((results) => {
+        const pokemon = results.map((data) => ({
+            name: data.name,
+            id: data.id,
+            image: data.sprites['front_default'],
+            type: data.types.map((type) => type.type.name).join(', ')
+        }));
+    
+        const pokemonHTMLString = pokemon.map (species => `
     <div class="card" id="pokedex">
         <img src="${species.image}" class="card-img" alt="${species.name}">
         <div class="card-img-overlay">
@@ -33,6 +34,9 @@ const displayPokemon = (pokemon) => {
 
     `)
     pokedex.innerHTML = pokemonHTMLString;
+
+    });
+    
 }
 
 fetchPokemon();
